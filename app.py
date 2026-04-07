@@ -8,13 +8,12 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 # Flask setup
 # -----------------------
 app = Flask(__name__)
+app.config["DEBUG"] = False
 
 UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-from flask import send_from_directory
 
-from flask import send_from_directory
 
 
 
@@ -94,9 +93,9 @@ def index():
         decision=decision,
         file_path=image_url
     )
-
+# For Gunicorn
+application = app
 # -----------------------
-import os
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
