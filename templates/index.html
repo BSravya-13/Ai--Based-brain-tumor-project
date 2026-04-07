@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MRI Tumor Detection System</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+
+            /* 🔹 Brain background */
+            background-image: url("/static/brain-image-1024x1024.webp");
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* 🔹 Soft white overlay so content is readable */
+        /* .page-overlay {
+            min-height: 100vh;
+            background-color: rgba(8, 109, 210, 0.9);
+            padding-top: 40px;
+            padding-bottom: 40px;
+        } */
+
+        .container {
+            max-width: 600px;
+        }
+
+        .card {
+            border-radius: 15px;
+        }
+
+        img {
+            max-height: 350px;
+            margin-top: 15px;
+        }
+        .text-secondary{
+            color: white;
+        }
+       
+    </style>
+</head>
+
+<body>
+<div class="page-overlay">
+<div class="container mt-5">
+-
+    <div class="text-center mb-4">
+        <h1 class="text-white fw-bold" style="text-shadow: 2px 2px 6px rgba(0,0,0,0.8);">
+          MRI Tumor Detection System</h1>
+
+       <p class="text-white">
+          Upload an MRI image to detect tumor type and AI confidence
+        </p>
+
+    </div>
+
+    <!-- Upload Form -->
+    <div class="card shadow p-4">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Select MRI Image</label>
+                <input type="file" class="form-control" name="file" accept="image/*" required>
+            </div>
+            <button class="btn btn-primary w-100">Upload and Detect</button>
+        </form>
+    </div>
+
+    <!-- Results -->
+    {% if result %}
+    <div class="card shadow p-4 mt-4">
+        <h4 class="text-success">Prediction: {{ result }}</h4>
+
+        <p><b>Confidence:</b> {{ confidence }}%</p>
+
+        <p>
+            <b>Risk Level:</b>
+            <span class="badge 
+                {% if risk == 'HIGH' %}bg-danger
+                {% elif risk == 'MEDIUM' %}bg-warning
+                {% else %}bg-success{% endif %}">
+                {{ risk }}
+            </span>
+        </p>
+
+        <p><b>AI Decision:</b> {{ decision }}</p>
+
+        <img src="{{ file_path }}" class="img-fluid rounded" alt="Uploaded MRI">
+    </div>
+    {% endif %}
+
+</div>
+</div>
+</body>
+</html>
