@@ -16,12 +16,7 @@ from flask import send_from_directory
 
 from flask import send_from_directory
 
-@app.route('/bg/<path:filename>')
-def bg_image(filename):
-    return send_from_directory(
-        r"C:\Users\sravy\OneDrive\Desktop\ML Project",
-        filename
-    )
+
 
 
 
