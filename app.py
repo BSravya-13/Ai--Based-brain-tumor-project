@@ -1,9 +1,8 @@
 import os
 import numpy as np
 import cv2
-import tensorflow.lite as tflite
-from flask import Flask, render_template, request
 import tflite_runtime.interpreter as tflite
+from flask import Flask, render_template, request
 
 # -----------------------
 # Flask setup
