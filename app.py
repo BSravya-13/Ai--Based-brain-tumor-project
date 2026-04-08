@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 import tensorflow.lite as tflite
 from flask import Flask, render_template, request
+import tflite_runtime.interpreter as tflite
 
 # -----------------------
 # Flask setup
@@ -99,10 +100,7 @@ def index():
 
 # For Gunicorn
 application = app
-try:
-    import tflite_runtime.interpreter as tflite
-except:
-    import tensorflow.lite as tflite
+
 # -----------------------
 # Run locally
 # -----------------------
