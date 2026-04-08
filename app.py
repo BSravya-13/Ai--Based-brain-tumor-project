@@ -1,8 +1,8 @@
 import os
 import numpy as np
-import tensorflow as tf
+import cv2
+import tensorflow.lite as tflite
 from flask import Flask, render_template, request
-from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 # -----------------------
 # Flask setup
@@ -14,15 +14,14 @@ UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-
-
-
-
 # -----------------------
-# Load trained model
+# Load TFLite model
 # -----------------------
-model = tf.keras.models.load_model("brain_tumor_model.keras")
+interpreter = tflite.Interpreter(model_path="model.tflite")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # MUST match training order
 CLASS_NAMES = ['glioma', 'meningioma', 'notumor', 'pituitary']
@@ -31,10 +30,10 @@ CLASS_NAMES = ['glioma', 'meningioma', 'notumor', 'pituitary']
 # Image preprocessing
 # -----------------------
 def preprocess_image(image_path):
-    img = load_img(image_path, target_size=(128, 128))
-    img = img_to_array(img)
+    img = cv2.imread(image_path)
+    img = cv2.resize(img, (128, 128))
     img = img / 255.0
-    img = np.expand_dims(img, axis=0)
+    img = np.expand_dims(img, axis=0).astype(np.float32)
     return img
 
 # -----------------------
@@ -74,7 +73,11 @@ def index():
             file.save(file_path)
 
             img = preprocess_image(file_path)
-            preds = model.predict(img)[0]
+
+            # TFLite prediction
+            interpreter.set_tensor(input_details[0]['index'], img)
+            interpreter.invoke()
+            preds = interpreter.get_tensor(output_details[0]['index'])[0]
 
             idx = np.argmax(preds)
             result = CLASS_NAMES[idx]
@@ -93,10 +96,16 @@ def index():
         decision=decision,
         file_path=image_url
     )
+
 # For Gunicorn
 application = app
+try:
+    import tflite_runtime.interpreter as tflite
+except:
+    import tensorflow.lite as tflite
 # -----------------------
-
+# Run locally
+# -----------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
